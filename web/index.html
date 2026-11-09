@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="bs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Body Creator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <header id="topbar">
+    <div class="seg" id="modeSeg">
+      <button data-mode="2d" class="on">2D list</button>
+      <button data-mode="3d">3D</button>
+    </div>
+    <select id="preset" aria-label="Predložak"></select>
+    <div class="actions">
+      <button id="btnRandom" title="Nasumično">🎲</button>
+      <button id="btnReset" title="Reset">↺</button>
+      <button id="btnSave" title="Spremi sliku">💾</button>
+    </div>
+  </header>
+
+  <main id="layout">
+    <section id="viewer">
+      <div id="sheet" class="view"></div>
+      <div id="three" class="view hidden"></div>
+
+      <div class="overlay" id="tools2d">
+        <button id="zoomOut">−</button>
+        <button id="zoomIn">+</button>
+        <label class="chk"><input type="checkbox" id="guides" checked> vodilice</label>
+      </div>
+      <div class="overlay hidden" id="tools3d">
+        <button data-view="front">Sprijeda</button>
+        <button data-view="side">Profil</button>
+        <button data-view="back">Otpozadi</button>
+        <button data-view="q">¾</button>
+        <input type="color" id="skin" value="#e0b9a0" title="Boja kože">
+        <label class="chk"><input type="checkbox" id="wire"> mreža</label>
+      </div>
+      <div id="measures"></div>
+    </section>
+
+    <aside id="panel">
+      <nav id="tabs"></nav>
+      <div id="sliders"></div>
+    </aside>
+  </main>
+
+  <div id="toast"></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
