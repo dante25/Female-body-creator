@@ -1,0 +1,944 @@
+{
+ "source": "MakeHuman 1.x base mesh and targets (CC0 1.0)",
+ "unit": "dm",
+ "vertexCount": 13524,
+ "position": {
+  "offset": 0,
+  "count": 40572
+ },
+ "body": {
+  "offset": 162288,
+  "count": 80268
+ },
+ "eyes": {
+  "offset": 483360,
+  "count": 840
+ },
+ "morphs": [
+  {
+   "id": "height",
+   "label": "Visina",
+   "group": "Tijelo",
+   "dec": {
+    "idx": {
+     "offset": 486720,
+     "count": 13524
+    },
+    "delta": {
+     "offset": 540816,
+     "count": 40572
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 703104,
+     "count": 13524
+    },
+    "delta": {
+     "offset": 757200,
+     "count": 40572
+    }
+   }
+  },
+  {
+   "id": "weight",
+   "label": "Težina / punoća",
+   "group": "Tijelo",
+   "dec": {
+    "idx": {
+     "offset": 919488,
+     "count": 4051
+    },
+    "delta": {
+     "offset": 935692,
+     "count": 12153
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 984304,
+     "count": 3355
+    },
+    "delta": {
+     "offset": 997724,
+     "count": 10065
+    }
+   }
+  },
+  {
+   "id": "muscle",
+   "label": "Mišićavost",
+   "group": "Tijelo",
+   "dec": {
+    "idx": {
+     "offset": 1037984,
+     "count": 2757
+    },
+    "delta": {
+     "offset": 1049012,
+     "count": 8271
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1082096,
+     "count": 3778
+    },
+    "delta": {
+     "offset": 1097208,
+     "count": 11334
+    }
+   }
+  },
+  {
+   "id": "headSize",
+   "label": "Veličina glave",
+   "group": "Glava i vrat",
+   "dec": {
+    "idx": {
+     "offset": 1142544,
+     "count": 4421
+    },
+    "delta": {
+     "offset": 1160228,
+     "count": 13263
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1213280,
+     "count": 4421
+    },
+    "delta": {
+     "offset": 1230964,
+     "count": 13263
+    }
+   }
+  },
+  {
+   "id": "headWidth",
+   "label": "Širina glave",
+   "group": "Glava i vrat",
+   "dec": {
+    "idx": {
+     "offset": 1284016,
+     "count": 4304
+    },
+    "delta": {
+     "offset": 1301232,
+     "count": 12912
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1352880,
+     "count": 4304
+    },
+    "delta": {
+     "offset": 1370096,
+     "count": 12912
+    }
+   }
+  },
+  {
+   "id": "headFat",
+   "label": "Punoća lica",
+   "group": "Glava i vrat",
+   "dec": {
+    "idx": {
+     "offset": 1421744,
+     "count": 743
+    },
+    "delta": {
+     "offset": 1424716,
+     "count": 2229
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1433632,
+     "count": 730
+    },
+    "delta": {
+     "offset": 1436552,
+     "count": 2190
+    }
+   }
+  },
+  {
+   "id": "neckLength",
+   "label": "Dužina vrata",
+   "group": "Glava i vrat",
+   "dec": {
+    "idx": {
+     "offset": 1445312,
+     "count": 4494
+    },
+    "delta": {
+     "offset": 1463288,
+     "count": 13482
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1517216,
+     "count": 4494
+    },
+    "delta": {
+     "offset": 1535192,
+     "count": 13482
+    }
+   }
+  },
+  {
+   "id": "neckCirc",
+   "label": "Debljina vrata",
+   "group": "Glava i vrat",
+   "dec": {
+    "idx": {
+     "offset": 1589120,
+     "count": 358
+    },
+    "delta": {
+     "offset": 1590552,
+     "count": 1074
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1594848,
+     "count": 636
+    },
+    "delta": {
+     "offset": 1597392,
+     "count": 1908
+    }
+   }
+  },
+  {
+   "id": "shoulders",
+   "label": "Širina ramena",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 1605024,
+     "count": 4690
+    },
+    "delta": {
+     "offset": 1623784,
+     "count": 14070
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1680064,
+     "count": 4516
+    },
+    "delta": {
+     "offset": 1698128,
+     "count": 13548
+    }
+   }
+  },
+  {
+   "id": "vshape",
+   "label": "V-oblik leđa",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 1752320,
+     "count": 5036
+    },
+    "delta": {
+     "offset": 1772464,
+     "count": 15108
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 1832896,
+     "count": 5006
+    },
+    "delta": {
+     "offset": 1852920,
+     "count": 15018
+    }
+   }
+  },
+  {
+   "id": "torsoLength",
+   "label": "Dužina trupa",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 1912992,
+     "count": 10124
+    },
+    "delta": {
+     "offset": 1953488,
+     "count": 30372
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2074976,
+     "count": 10128
+    },
+    "delta": {
+     "offset": 2115488,
+     "count": 30384
+    }
+   }
+  },
+  {
+   "id": "torsoDepth",
+   "label": "Dubina trupa",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2237024,
+     "count": 1671
+    },
+    "delta": {
+     "offset": 2243708,
+     "count": 5013
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2263760,
+     "count": 1590
+    },
+    "delta": {
+     "offset": 2270120,
+     "count": 4770
+    }
+   }
+  },
+  {
+   "id": "underbust",
+   "label": "Obim ispod grudi",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2289200,
+     "count": 1067
+    },
+    "delta": {
+     "offset": 2293468,
+     "count": 3201
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2306272,
+     "count": 1107
+    },
+    "delta": {
+     "offset": 2310700,
+     "count": 3321
+    }
+   }
+  },
+  {
+   "id": "waist",
+   "label": "Struk",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2323984,
+     "count": 818
+    },
+    "delta": {
+     "offset": 2327256,
+     "count": 2454
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2337072,
+     "count": 818
+    },
+    "delta": {
+     "offset": 2340344,
+     "count": 2454
+    }
+   }
+  },
+  {
+   "id": "belly",
+   "label": "Stomak",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2350160,
+     "count": 140
+    },
+    "delta": {
+     "offset": 2350720,
+     "count": 420
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2352400,
+     "count": 346
+    },
+    "delta": {
+     "offset": 2353784,
+     "count": 1038
+    }
+   }
+  },
+  {
+   "id": "hips",
+   "label": "Bokovi",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2357936,
+     "count": 692
+    },
+    "delta": {
+     "offset": 2360704,
+     "count": 2076
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2369008,
+     "count": 707
+    },
+    "delta": {
+     "offset": 2371836,
+     "count": 2121
+    }
+   }
+  },
+  {
+   "id": "waistHeight",
+   "label": "Visina struka",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2380320,
+     "count": 940
+    },
+    "delta": {
+     "offset": 2384080,
+     "count": 2820
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2395360,
+     "count": 523
+    },
+    "delta": {
+     "offset": 2397452,
+     "count": 1569
+    }
+   }
+  },
+  {
+   "id": "glutes",
+   "label": "Zadnjica",
+   "group": "Trup",
+   "dec": {
+    "idx": {
+     "offset": 2403728,
+     "count": 197
+    },
+    "delta": {
+     "offset": 2404516,
+     "count": 591
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2406880,
+     "count": 491
+    },
+    "delta": {
+     "offset": 2408844,
+     "count": 1473
+    }
+   }
+  },
+  {
+   "id": "bustSize",
+   "label": "Veličina grudi",
+   "group": "Grudi",
+   "dec": {
+    "idx": {
+     "offset": 2414736,
+     "count": 402
+    },
+    "delta": {
+     "offset": 2416344,
+     "count": 1206
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2421168,
+     "count": 404
+    },
+    "delta": {
+     "offset": 2422784,
+     "count": 1212
+    }
+   }
+  },
+  {
+   "id": "bustFirm",
+   "label": "Čvrstoća grudi",
+   "group": "Grudi",
+   "dec": {
+    "idx": {
+     "offset": 2427632,
+     "count": 250
+    },
+    "delta": {
+     "offset": 2428632,
+     "count": 750
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2431632,
+     "count": 280
+    },
+    "delta": {
+     "offset": 2432752,
+     "count": 840
+    }
+   }
+  },
+  {
+   "id": "bustHeight",
+   "label": "Visina grudi",
+   "group": "Grudi",
+   "dec": {
+    "idx": {
+     "offset": 2436112,
+     "count": 583
+    },
+    "delta": {
+     "offset": 2438444,
+     "count": 1749
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2445440,
+     "count": 579
+    },
+    "delta": {
+     "offset": 2447756,
+     "count": 1737
+    }
+   }
+  },
+  {
+   "id": "bustDist",
+   "label": "Razmak grudi",
+   "group": "Grudi",
+   "dec": {
+    "idx": {
+     "offset": 2454704,
+     "count": 294
+    },
+    "delta": {
+     "offset": 2455880,
+     "count": 882
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2459408,
+     "count": 290
+    },
+    "delta": {
+     "offset": 2460568,
+     "count": 870
+    }
+   }
+  },
+  {
+   "id": "bustPoint",
+   "label": "Isturenost grudi",
+   "group": "Grudi",
+   "dec": {
+    "idx": {
+     "offset": 2464048,
+     "count": 278
+    },
+    "delta": {
+     "offset": 2465160,
+     "count": 834
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2468496,
+     "count": 200
+    },
+    "delta": {
+     "offset": 2469296,
+     "count": 600
+    }
+   }
+  },
+  {
+   "id": "bustVol",
+   "label": "Volumen gore/dolje",
+   "group": "Grudi",
+   "dec": {
+    "idx": {
+     "offset": 2471696,
+     "count": 241
+    },
+    "delta": {
+     "offset": 2472660,
+     "count": 723
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2475552,
+     "count": 344
+    },
+    "delta": {
+     "offset": 2476928,
+     "count": 1032
+    }
+   }
+  },
+  {
+   "id": "upperArmLen",
+   "label": "Dužina nadlaktice",
+   "group": "Ruke",
+   "dec": {
+    "idx": {
+     "offset": 2481056,
+     "count": 4140
+    },
+    "delta": {
+     "offset": 2497616,
+     "count": 12420
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2547296,
+     "count": 4146
+    },
+    "delta": {
+     "offset": 2563880,
+     "count": 12438
+    }
+   }
+  },
+  {
+   "id": "lowerArmLen",
+   "label": "Dužina podlaktice",
+   "group": "Ruke",
+   "dec": {
+    "idx": {
+     "offset": 2613632,
+     "count": 3660
+    },
+    "delta": {
+     "offset": 2628272,
+     "count": 10980
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2672192,
+     "count": 3568
+    },
+    "delta": {
+     "offset": 2686464,
+     "count": 10704
+    }
+   }
+  },
+  {
+   "id": "upperArm",
+   "label": "Debljina nadlaktice",
+   "group": "Ruke",
+   "dec": {
+    "idx": {
+     "offset": 2729280,
+     "count": 522
+    },
+    "delta": {
+     "offset": 2731368,
+     "count": 1566
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2737632,
+     "count": 522
+    },
+    "delta": {
+     "offset": 2739720,
+     "count": 1566
+    }
+   }
+  },
+  {
+   "id": "lowerArm",
+   "label": "Debljina podlaktice",
+   "group": "Ruke",
+   "dec": {
+    "idx": {
+     "offset": 2745984,
+     "count": 332
+    },
+    "delta": {
+     "offset": 2747312,
+     "count": 996
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2751296,
+     "count": 842
+    },
+    "delta": {
+     "offset": 2754664,
+     "count": 2526
+    }
+   }
+  },
+  {
+   "id": "wrist",
+   "label": "Zglob šake",
+   "group": "Ruke",
+   "dec": {
+    "idx": {
+     "offset": 2764768,
+     "count": 444
+    },
+    "delta": {
+     "offset": 2766544,
+     "count": 1332
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2771872,
+     "count": 446
+    },
+    "delta": {
+     "offset": 2773656,
+     "count": 1338
+    }
+   }
+  },
+  {
+   "id": "hands",
+   "label": "Veličina šaka",
+   "group": "Ruke",
+   "dec": {
+    "idx": {
+     "offset": 2779008,
+     "count": 3378
+    },
+    "delta": {
+     "offset": 2792520,
+     "count": 10134
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2833056,
+     "count": 3378
+    },
+    "delta": {
+     "offset": 2846568,
+     "count": 10134
+    }
+   }
+  },
+  {
+   "id": "upperLegLen",
+   "label": "Dužina natkoljenice",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 2887104,
+     "count": 3309
+    },
+    "delta": {
+     "offset": 2900340,
+     "count": 9927
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 2940048,
+     "count": 3162
+    },
+    "delta": {
+     "offset": 2952696,
+     "count": 9486
+    }
+   }
+  },
+  {
+   "id": "lowerLegLen",
+   "label": "Dužina potkoljenice",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 2990640,
+     "count": 2602
+    },
+    "delta": {
+     "offset": 3001048,
+     "count": 7806
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 3032272,
+     "count": 2554
+    },
+    "delta": {
+     "offset": 3042488,
+     "count": 7662
+    }
+   }
+  },
+  {
+   "id": "thighs",
+   "label": "Butine",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 3073136,
+     "count": 512
+    },
+    "delta": {
+     "offset": 3075184,
+     "count": 1536
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 3081328,
+     "count": 520
+    },
+    "delta": {
+     "offset": 3083408,
+     "count": 1560
+    }
+   }
+  },
+  {
+   "id": "knees",
+   "label": "Koljena",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 3089648,
+     "count": 528
+    },
+    "delta": {
+     "offset": 3091760,
+     "count": 1584
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 3098096,
+     "count": 534
+    },
+    "delta": {
+     "offset": 3100232,
+     "count": 1602
+    }
+   }
+  },
+  {
+   "id": "calves",
+   "label": "Listovi",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 3106640,
+     "count": 400
+    },
+    "delta": {
+     "offset": 3108240,
+     "count": 1200
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 3113040,
+     "count": 400
+    },
+    "delta": {
+     "offset": 3114640,
+     "count": 1200
+    }
+   }
+  },
+  {
+   "id": "ankles",
+   "label": "Gležnjevi",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 3119440,
+     "count": 496
+    },
+    "delta": {
+     "offset": 3121424,
+     "count": 1488
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 3127376,
+     "count": 496
+    },
+    "delta": {
+     "offset": 3129360,
+     "count": 1488
+    }
+   }
+  },
+  {
+   "id": "feet",
+   "label": "Veličina stopala",
+   "group": "Noge",
+   "dec": {
+    "idx": {
+     "offset": 3135312,
+     "count": 2300
+    },
+    "delta": {
+     "offset": 3144512,
+     "count": 6900
+    }
+   },
+   "inc": {
+    "idx": {
+     "offset": 3172112,
+     "count": 2366
+    },
+    "delta": {
+     "offset": 3181576,
+     "count": 7098
+    }
+   }
+  }
+ ]
+}

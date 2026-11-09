@@ -1,209 +1,206 @@
-import { PARAM_GROUPS, ALL_PARAMS, PRESETS, defaultParams, buildModel, clamp } from './model.js';
-import { renderSheet } from './sheet2d.js';
+import { loadBody } from './body.js';
+import { Viewer } from './viewer.js';
 
 const $ = s => document.querySelector(s);
-const STORE = 'bodyCreator.v1';
+const KEY = 'bodyCreator.v2';
 
-// ---------- stanje ----------
+const PRESETS = {
+  'Prosječna': {},
+  'Vitka': { weight: -60, muscle: -10, waist: -30, hips: -20, thighs: -30, bustSize: -30, glutes: -20, upperArm: -20 },
+  'Atletska': { weight: -30, muscle: 80, shoulders: 25, vshape: 25, waist: -15, glutes: 30, thighs: 20, calves: 30, bustSize: -20 },
+  'Pješčani sat': { waist: -55, hips: 50, bustSize: 60, glutes: 50, thighs: 20, bustFirm: 30 },
+  'Kruška': { shoulders: -20, bustSize: -30, waist: -10, hips: 80, glutes: 60, thighs: 50 },
+  'Punija': { weight: 80, belly: 40, bustSize: 50, hips: 40, glutes: 40, thighs: 40, upperArm: 40 },
+  'Visoka manekenka': { height: 70, weight: -50, upperLegLen: 30, lowerLegLen: 30, waist: -30, hips: -10, bustSize: -20, neckLength: 30 },
+};
+
 const store = {
-  get() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } },
-  set(v) { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch { /* nema pohrane */ } },
+  get() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } },
+  set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch { /* nema pohrane */ } },
 };
+
+let body, viewer;
 const saved = store.get();
-const state = {
-  P: { ...defaultParams(), ...(saved.P || {}) },
-  mode: saved.mode || '2d',
-  tab: saved.tab || PARAM_GROUPS[0].id,
-  guides: saved.guides ?? true,
-  skin: saved.skin || '#e0b9a0',
-  zoom: 1,
-};
-const persist = () => store.set({ P: state.P, mode: state.mode, tab: state.tab, guides: state.guides, skin: state.skin });
+const state = { values: {}, chars: saved.chars || {}, tab: saved.tab, mode: saved.mode || '3d', skin: saved.skin || '#e2b49a', guides: saved.guides ?? true };
+const persist = () => store.set({ values: state.values, chars: state.chars, tab: state.tab, mode: state.mode, skin: state.skin, guides: state.guides });
 
-let view3d = null;
-let M = null;
-
-// ---------- slajderi ----------
-const inputs = {};
-function buildSliders() {
-  const tabs = $('#tabs'), box = $('#sliders');
-  for (const g of PARAM_GROUPS) {
-    const b = document.createElement('button');
-    b.textContent = g.label; b.dataset.tab = g.id;
-    b.onclick = () => { state.tab = g.id; showTab(); persist(); };
-    tabs.appendChild(b);
-
-    const sec = document.createElement('div');
-    sec.className = 'group'; sec.dataset.group = g.id;
-    for (const d of g.params) {
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.innerHTML = `<div class="top"><span class="lbl">${d.label}</span><span class="val"></span></div>
-        <input type="range" min="${d.min}" max="${d.max}" step="1">`;
-      const inp = row.querySelector('input');
-      inp.oninput = () => { state.P[d.id] = +inp.value; syncRow(d); schedule(); };
-      inp.onchange = persist;
-      // dupli dodir na naziv vraća zadanu vrijednost
-      row.querySelector('.top').ondblclick = () => { state.P[d.id] = d.def; syncRow(d); schedule(); persist(); };
-      inputs[d.id] = { inp, row, val: row.querySelector('.val') };
-      sec.appendChild(row);
-    }
-    box.appendChild(sec);
-  }
-  const hint = document.createElement('div');
-  hint.className = 'hint';
-  hint.textContent = 'Savjet: dvaput dodirni naziv slajdera za vraćanje na zadanu vrijednost.';
-  box.appendChild(hint);
-}
-
-function syncRow(d) {
-  const { inp, row, val } = inputs[d.id];
-  const v = state.P[d.id];
-  inp.value = v;
-  inp.style.setProperty('--p', `${(v - d.min) / (d.max - d.min) * 100}%`);
-  val.textContent = d.unit ? `${v} ${d.unit}` : v;
-  row.classList.toggle('changed', v !== d.def);
-}
-const syncAll = () => ALL_PARAMS.forEach(syncRow);
-
-function showTab() {
-  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === state.tab));
-  document.querySelectorAll('.group').forEach(s => s.classList.toggle('hidden', s.dataset.group !== state.tab));
-}
-
-// ---------- crtanje ----------
-let pending = false;
-function schedule() {
-  if (pending) return;
-  pending = true;
-  requestAnimationFrame(() => { pending = false; render(); });
-}
-
-function render() {
-  M = buildModel(state.P);
-  const ms = M.measures;
-  $('#measures').innerHTML =
-    `Visina <b>${ms.height.toFixed(0)}</b> cm<br>` +
-    `Grudi <b>${ms.bust.toFixed(0)}</b> · Struk <b>${ms.waist.toFixed(0)}</b> · Bokovi <b>${ms.hips.toFixed(0)}</b>`;
-  if (state.mode === '2d') {
-    $('#sheet').innerHTML = renderSheet(M, { guides: state.guides });
-    applyZoom();
-  } else if (view3d) {
-    view3d.update(M);
-  }
-}
-
-function applyZoom() {
-  const sheet = $('#sheet'), svg = sheet.querySelector('svg');
-  if (!svg) return;
-  sheet.classList.toggle('zoomed', state.zoom > 1);
-  svg.style.width = state.zoom > 1 ? `${state.zoom * 100}%` : '';
-}
-
-async function setMode(mode) {
-  state.mode = mode; persist();
-  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
-  const is3d = mode === '3d';
-  $('#sheet').classList.toggle('hidden', is3d);
-  $('#tools2d').classList.toggle('hidden', is3d);
-  $('#three').classList.toggle('hidden', !is3d);
-  $('#tools3d').classList.toggle('hidden', !is3d);
-  if (is3d && !view3d) {
-    try {
-      const { View3D } = await import('./view3d.js');
-      view3d = new View3D($('#three'));
-      view3d.setColor(state.skin);
-    } catch (e) {
-      toast('3D nije dostupan: ' + e.message);
-      return setMode('2d');
-    }
-  }
-  if (view3d) view3d.setVisible(is3d);
-  render();
-}
-
-// ---------- spremanje slike ----------
 function toast(msg) {
   const t = $('#toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-function sheetToPng() {
-  return new Promise((resolve, reject) => {
-    const svg = renderSheet(M, { guides: state.guides });
-    const vb = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number);
-    const W = 2400, Hh = Math.round(W * vb[3] / vb[2]);
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas'); c.width = W; c.height = Hh;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, Hh);
-      ctx.drawImage(img, 0, 0, W, Hh);
-      resolve(c.toDataURL('image/png'));
-    };
-    img.onerror = reject;
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.replace('<svg ', `<svg width="${W}" height="${Hh}" `));
+// ---------- slajderi ----------
+const rows = {};
+function buildUI() {
+  const tabs = $('#tabs'), box = $('#sliders');
+  if (!body.groups.includes(state.tab)) state.tab = body.groups[0];
+  for (const g of body.groups) {
+    const b = document.createElement('button');
+    b.textContent = g; b.dataset.tab = g;
+    b.onclick = () => { state.tab = g; showTab(); persist(); };
+    tabs.appendChild(b);
+    const sec = document.createElement('div');
+    sec.className = 'group'; sec.dataset.group = g;
+    for (const m of body.morphs.filter(m => m.group === g)) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `<div class="top"><span>${m.label}</span><span class="val"></span></div><input type="range" min="-100" max="100" step="1">`;
+      const inp = row.querySelector('input');
+      inp.oninput = () => { state.values[m.id] = +inp.value; syncRow(m.id); schedule(); };
+      inp.onchange = persist;
+      row.querySelector('.top').ondblclick = () => { state.values[m.id] = 0; syncRow(m.id); schedule(); persist(); };
+      rows[m.id] = { row, inp, val: row.querySelector('.val') };
+      sec.appendChild(row);
+    }
+    box.appendChild(sec);
+  }
+  showTab();
+}
+
+function syncRow(id) {
+  const { row, inp, val } = rows[id];
+  const v = state.values[id] || 0;
+  inp.value = v;
+  const p = (v + 100) / 2;
+  inp.style.setProperty('--a', `${Math.min(50, p)}%`);
+  inp.style.setProperty('--b', `${Math.max(50, p)}%`);
+  val.textContent = v > 0 ? `+${v}` : v;
+  row.classList.toggle('zero', v === 0);
+}
+const syncAll = () => Object.keys(rows).forEach(syncRow);
+
+function showTab() {
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === state.tab));
+  document.querySelectorAll('.group').forEach(s => s.classList.toggle('hidden', s.dataset.group !== state.tab));
+}
+
+let pending = false;
+function schedule() {
+  if (pending) return;
+  pending = true;
+  requestAnimationFrame(() => {
+    pending = false;
+    const h = body.apply(state.values);
+    viewer.update();
+    $('#height').textContent = `Visina ${h.toFixed(0)} cm`;
   });
 }
 
-async function saveImage() {
-  try {
-    const dataUrl = state.mode === '2d' ? await sheetToPng() : view3d.snapshot();
-    const name = `body_${state.mode}_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.png`;
-    if (window.AndroidBridge && window.AndroidBridge.savePng) {
-      const res = window.AndroidBridge.savePng(dataUrl.split(',')[1], name);
-      toast(res || 'Spremljeno');
-    } else {
-      const a = document.createElement('a');
-      a.href = dataUrl; a.download = name; a.click();
-      toast('Slika preuzeta');
-    }
-  } catch (e) {
-    toast('Greška pri spremanju: ' + e.message);
-  }
-}
-
-// ---------- predlošci / nasumično ----------
-function buildPresets() {
-  const sel = $('#preset');
-  sel.innerHTML = '<option value="">Predložak…</option>' +
-    Object.keys(PRESETS).map(k => `<option>${k}</option>`).join('');
-  sel.onchange = () => {
-    if (!sel.value) return;
-    state.P = { ...defaultParams(), ...PRESETS[sel.value] };
-    sel.value = '';
-    syncAll(); schedule(); persist();
-  };
-}
-
-function randomize() {
-  const g = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; // ~normalno, [-1,1]
-  for (const d of ALL_PARAMS) {
-    const span = d.id === 'height' ? 0.5 : 0.75;
-    const half = (d.max - d.min) / 2 * span;
-    state.P[d.id] = Math.round(clamp(d.def + g() * half, d.min, d.max));
-  }
+function setValues(v) {
+  state.values = { ...body.defaults(), ...v };
   syncAll(); schedule(); persist();
 }
 
+function setMode(m) {
+  state.mode = m; persist();
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  $('#tools3d').classList.toggle('hidden', m !== '3d');
+  $('#toolsSheet').classList.toggle('hidden', m !== 'sheet');
+  viewer.setMode(m);
+  $('#height').classList.toggle('hidden', m !== '3d');
+}
+
+// ---------- likovi ----------
+function renderChars() {
+  const list = $('#charList');
+  const names = Object.keys(state.chars).sort((a, b) => a.localeCompare(b));
+  list.innerHTML = names.length ? '' : '<div class="empty">Još nema spremljenih likova.</div>';
+  for (const n of names) {
+    const r = document.createElement('div');
+    r.className = 'charrow';
+    r.innerHTML = `<button class="item"><b></b><span>dodirni za učitavanje</span></button><button class="del" title="Obriši">🗑</button>`;
+    r.querySelector('b').textContent = n;
+    r.querySelector('.item').onclick = () => { setValues(state.chars[n]); close(); toast(`Učitano: ${n}`); };
+    r.querySelector('.del').onclick = () => { delete state.chars[n]; persist(); renderChars(); };
+    list.appendChild(r);
+  }
+  const pl = $('#presetList');
+  pl.innerHTML = '';
+  for (const n of Object.keys(PRESETS)) {
+    const b = document.createElement('button');
+    b.className = 'item'; b.innerHTML = '<b></b>';
+    b.querySelector('b').textContent = n;
+    b.onclick = () => { setValues(PRESETS[n]); close(); toast(`Predložak: ${n}`); };
+    pl.appendChild(b);
+  }
+}
+function open(id) { $(id).classList.remove('hidden'); }
+function close() { document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden')); }
+
+// ---------- export ----------
+function stamp() { return new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19); }
+
+function saveFile(name, mime, { dataUrl, text }) {
+  const b64 = dataUrl ? dataUrl.split(',')[1] : btoa(unescape(encodeURIComponent(text)));
+  if (window.AndroidBridge && window.AndroidBridge.saveFile) {
+    toast(window.AndroidBridge.saveFile(b64, name, mime) || 'Spremljeno');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = dataUrl || URL.createObjectURL(new Blob([text], { type: mime }));
+  a.download = name; a.click();
+  toast('Preuzeto: ' + name);
+}
+
+function doExport(kind) {
+  close();
+  try {
+    if (kind === 'sheet') saveFile(`character_sheet_${stamp()}.png`, 'image/png', { dataUrl: viewer.snapshot(true) });
+    if (kind === 'view') saveFile(`body_${stamp()}.png`, 'image/png', { dataUrl: viewer.snapshot(false) });
+    if (kind === 'obj') saveFile(`body_${stamp()}.obj`, 'text/plain', { text: body.toOBJ() });
+    if (kind === 'json') saveFile(`body_${stamp()}.json`, 'application/json', { text: JSON.stringify({ app: 'BodyCreator', values: state.values }, null, 1) });
+  } catch (e) {
+    toast('Greška: ' + e.message);
+  }
+}
+
 // ---------- start ----------
-buildSliders();
-buildPresets();
-syncAll();
-showTab();
-$('#guides').checked = state.guides;
-$('#skin').value = state.skin;
+(async () => {
+  try {
+    body = await loadBody();
+  } catch (e) {
+    $('#loading').textContent = 'Greška pri učitavanju modela: ' + e.message;
+    return;
+  }
+  $('#loading').remove();
+  viewer = new Viewer($('#viewer'), body);
+  state.values = { ...body.defaults(), ...(saved.values || {}) };
+  buildUI();
+  syncAll();
+  body.apply(state.values);
+  viewer.update();
+  viewer.view('front');
+  viewer.setSkin(state.skin);
+  viewer.setGuides(state.guides);
+  schedule();
+  setMode(state.mode);
 
-document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
-$('#btnRandom').onclick = randomize;
-$('#btnReset').onclick = () => { state.P = defaultParams(); syncAll(); schedule(); persist(); toast('Vraćeno na zadano'); };
-$('#btnSave').onclick = saveImage;
-$('#guides').onchange = e => { state.guides = e.target.checked; persist(); schedule(); };
-$('#zoomIn').onclick = () => { state.zoom = Math.min(4, state.zoom * 1.5); applyZoom(); };
-$('#zoomOut').onclick = () => { state.zoom = Math.max(1, state.zoom / 1.5); applyZoom(); };
-$('#skin').oninput = e => { state.skin = e.target.value; view3d?.setColor(state.skin); persist(); };
-$('#wire').onchange = e => view3d?.setWireframe(e.target.checked);
-document.querySelectorAll('#tools3d [data-view]').forEach(b => b.onclick = () => view3d?.setView(b.dataset.view));
-
-setMode(state.mode);
+  document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+  document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => viewer.view(b.dataset.view));
+  $('#skin').value = state.skin;
+  $('#skin').oninput = e => { state.skin = e.target.value; viewer.setSkin(state.skin); persist(); };
+  $('#guides').checked = state.guides;
+  $('#guides').onchange = e => { state.guides = e.target.checked; viewer.setGuides(state.guides); persist(); };
+  $('#btnReset').onclick = () => { setValues({}); toast('Vraćeno na bazni model'); };
+  $('#btnChars').onclick = () => { renderChars(); open('#charsModal'); };
+  $('#btnExport').onclick = () => open('#exportModal');
+  $('#btnSaveChar').onclick = () => {
+    const n = $('#charName').value.trim();
+    if (!n) { toast('Upiši ime lika'); return; }
+    state.chars[n] = { ...state.values }; persist(); renderChars();
+    $('#charName').value = '';
+    toast(`Spremljeno: ${n}`);
+  };
+  document.querySelectorAll('[data-close]').forEach(b => b.onclick = close);
+  document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if (e.target === m) close(); });
+  document.querySelectorAll('[data-export]').forEach(b => b.onclick = () => doExport(b.dataset.export));
+  $('#importFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const j = JSON.parse(await f.text());
+      setValues(j.values || j); close(); toast('Postavke učitane');
+    } catch { toast('Neispravan fajl'); }
+    e.target.value = '';
+  };
+})();

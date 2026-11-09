@@ -10,36 +10,29 @@
 <body>
   <header id="topbar">
     <div class="seg" id="modeSeg">
-      <button data-mode="2d" class="on">2D list</button>
-      <button data-mode="3d">3D</button>
+      <button data-mode="3d" class="on">3D</button>
+      <button data-mode="sheet">List</button>
     </div>
-    <select id="preset" aria-label="Predložak"></select>
-    <div class="actions">
-      <button id="btnRandom" title="Nasumično">🎲</button>
-      <button id="btnReset" title="Reset">↺</button>
-      <button id="btnSave" title="Spremi sliku">💾</button>
-    </div>
+    <div class="spacer"></div>
+    <button class="tb" id="btnReset">Reset</button>
+    <button class="tb" id="btnChars">Likovi</button>
+    <button class="tb primary" id="btnExport">Export</button>
   </header>
 
   <main id="layout">
     <section id="viewer">
-      <div id="sheet" class="view"></div>
-      <div id="three" class="view hidden"></div>
-
-      <div class="overlay" id="tools2d">
-        <button id="zoomOut">−</button>
-        <button id="zoomIn">+</button>
-        <label class="chk"><input type="checkbox" id="guides" checked> vodilice</label>
-      </div>
-      <div class="overlay hidden" id="tools3d">
+      <div id="loading">Učitavanje modela…</div>
+      <div class="tools" id="tools3d">
         <button data-view="front">Sprijeda</button>
         <button data-view="side">Profil</button>
         <button data-view="back">Otpozadi</button>
         <button data-view="q">¾</button>
-        <input type="color" id="skin" value="#e0b9a0" title="Boja kože">
-        <label class="chk"><input type="checkbox" id="wire"> mreža</label>
+        <input type="color" id="skin" value="#e2b49a" title="Boja kože">
       </div>
-      <div id="measures"></div>
+      <div class="tools hidden" id="toolsSheet">
+        <label class="chk"><input type="checkbox" id="guides" checked> vodilice</label>
+      </div>
+      <div id="height"></div>
     </section>
 
     <aside id="panel">
@@ -47,6 +40,35 @@
       <div id="sliders"></div>
     </aside>
   </main>
+
+  <!-- Likovi: spremanje / učitavanje -->
+  <div class="modal hidden" id="charsModal">
+    <div class="sheet">
+      <div class="mhead"><b>Likovi</b><button class="x" data-close>✕</button></div>
+      <div class="saverow">
+        <input id="charName" placeholder="Ime lika" maxlength="40">
+        <button class="primary" id="btnSaveChar">Spremi</button>
+      </div>
+      <div class="label">Moji likovi</div>
+      <div id="charList" class="list"></div>
+      <div class="label">Predlošci</div>
+      <div id="presetList" class="list"></div>
+    </div>
+  </div>
+
+  <!-- Export -->
+  <div class="modal hidden" id="exportModal">
+    <div class="sheet">
+      <div class="mhead"><b>Export</b><button class="x" data-close>✕</button></div>
+      <div class="list">
+        <button class="item" data-export="sheet"><b>Character sheet (PNG)</b><span>sprijeda · profil · otpozadi, 2400 px</span></button>
+        <button class="item" data-export="view"><b>Trenutni prikaz (PNG)</b><span>slika onoga što je na ekranu</span></button>
+        <button class="item" data-export="obj"><b>3D model (OBJ)</b><span>za Blender, ZBrush, Maya… (cm)</span></button>
+        <button class="item" data-export="json"><b>Postavke slajdera (JSON)</b><span>za kasnije učitavanje</span></button>
+        <label class="item"><b>Uvezi postavke (JSON)</b><span>učitaj ranije izvezen fajl</span><input type="file" id="importFile" accept=".json,application/json" hidden></label>
+      </div>
+    </div>
+  </div>
 
   <div id="toast"></div>
   <script type="module" src="js/main.js"></script>
