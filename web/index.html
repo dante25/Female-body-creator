@@ -12,6 +12,7 @@
     <div class="seg" id="modeSeg">
       <button data-mode="3d" class="on">3D</button>
       <button data-mode="sheet">List</button>
+      <button data-mode="image">Slika</button>
     </div>
     <div class="spacer"></div>
     <button class="tb" id="btnReset">Reset</button>
@@ -32,6 +33,13 @@
       <div class="tools hidden" id="toolsSheet">
         <label class="chk"><input type="checkbox" id="guides" checked> vodilice</label>
       </div>
+      <div class="tools hidden" id="toolsImage">
+        <label class="tbtn">Učitaj sliku<input type="file" id="imgFile" accept="image/*" hidden></label>
+        <button id="btnOrig">Original</button>
+        <button id="btnFace">Profil gleda: ←</button>
+        <button id="btnDefImg">Zadana</button>
+      </div>
+      <div id="imgInfo" class="hidden"></div>
       <div id="height"></div>
     </section>
 
@@ -62,7 +70,7 @@
       <div class="mhead"><b>Export</b><button class="x" data-close>✕</button></div>
       <div class="list">
         <button class="item" data-export="sheet"><b>Character sheet (PNG)</b><span>sprijeda · profil · otpozadi, 2400 px</span></button>
-        <button class="item" data-export="view"><b>Trenutni prikaz (PNG)</b><span>slika onoga što je na ekranu</span></button>
+        <button class="item" data-export="view"><b>Trenutni prikaz (PNG)</b><span>3D prikaz, list ili transformisana slika (puna rezolucija)</span></button>
         <button class="item" data-export="obj"><b>3D model (OBJ)</b><span>za Blender, ZBrush, Maya… (cm)</span></button>
         <button class="item" data-export="json"><b>Postavke slajdera (JSON)</b><span>za kasnije učitavanje</span></button>
         <label class="item"><b>Uvezi postavke (JSON)</b><span>učitaj ranije izvezen fajl</span><input type="file" id="importFile" accept=".json,application/json" hidden></label>

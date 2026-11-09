@@ -109,6 +109,8 @@ export class Viewer {
     this.mode = m;
     this.controls.enabled = m === '3d';
     this.overlay.style.display = m === 'sheet' ? 'block' : 'none';
+    this.renderer.domElement.style.display = m === 'image' ? 'none' : 'block';
+    if (m === 'image') this.overlay.style.display = 'none';
     this.requestRender();
   }
 
@@ -165,7 +167,7 @@ export class Viewer {
     return { bh, pw, top, ph, fh, fw: fh * aspect, cy: bh * 0.5 };
   }
 
-  drawSheet(W, H, ctx, pr = 1) {
+  drawSheet(W, H, ctx, pr = 1, clean = false) {
     const r = this.renderer;
     const L = this.sheetLayout(W, H);
     r.setScissorTest(true);
@@ -186,7 +188,7 @@ export class Viewer {
     });
     r.setScissorTest(false);
     r.setClearColor(0x000000, 0);
-    this.drawOverlay(ctx, W, H, L, pr);
+    if (!clean) this.drawOverlay(ctx, W, H, L, pr);
   }
 
   drawOverlay(ctx, W, H, L, pr) {
@@ -218,7 +220,7 @@ export class Viewer {
   }
 
   // PNG trenutnog prikaza ili cijelog lista u visokoj rezoluciji
-  snapshot(sheet) {
+  snapshot(sheet, clean = false) {
     const r = this.renderer;
     if (!sheet) { this.draw(); return r.domElement.toDataURL('image/png'); }
     const W = 2400, H = 1500;
@@ -229,7 +231,7 @@ export class Viewer {
     c.width = W; c.height = H;
     const ctx = c.getContext('2d');
     const mode = this.mode; this.mode = 'sheet';
-    this.drawSheet(W, H, ctx, 1);
+    this.drawSheet(W, H, ctx, 1, clean);
     const ov = document.createElement('canvas'); ov.width = W; ov.height = H;
     ov.getContext('2d').drawImage(c, 0, 0);
     ctx.clearRect(0, 0, W, H);

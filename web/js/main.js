@@ -1,5 +1,8 @@
 import { loadBody } from './body.js';
 import { Viewer } from './viewer.js';
+import { WarpView, WARP_SUPPORTED } from './warp.js';
+
+const IMG_KEY = 'bodyCreator.image';
 
 const $ = s => document.querySelector(s);
 const KEY = 'bodyCreator.v2';
@@ -19,10 +22,10 @@ const store = {
   set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch { /* nema pohrane */ } },
 };
 
-let body, viewer;
+let body, viewer, warp;
 const saved = store.get();
-const state = { values: {}, chars: saved.chars || {}, tab: saved.tab, mode: saved.mode || '3d', skin: saved.skin || '#e2b49a', guides: saved.guides ?? true };
-const persist = () => store.set({ values: state.values, chars: state.chars, tab: state.tab, mode: state.mode, skin: state.skin, guides: state.guides });
+const state = { values: {}, chars: saved.chars || {}, tab: saved.tab, mode: saved.mode || '3d', skin: saved.skin || '#e2b49a', guides: saved.guides ?? true, faceLeft: saved.faceLeft ?? true };
+const persist = () => store.set({ values: state.values, chars: state.chars, tab: state.tab, mode: state.mode, skin: state.skin, guides: state.guides, faceLeft: state.faceLeft });
 
 function toast(msg) {
   const t = $('#toast');
@@ -83,6 +86,7 @@ function schedule() {
     pending = false;
     const h = body.apply(state.values);
     viewer.update();
+    if (warp && warp.loaded) warp.update(state.values);
     $('#height').textContent = `Visina ${h.toFixed(0)} cm`;
   });
 }
@@ -92,13 +96,77 @@ function setValues(v) {
   syncAll(); schedule(); persist();
 }
 
-function setMode(m) {
+async function setMode(m) {
+  if (m === 'image' && !(await ensureWarp())) m = '3d';
   state.mode = m; persist();
   document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   $('#tools3d').classList.toggle('hidden', m !== '3d');
   $('#toolsSheet').classList.toggle('hidden', m !== 'sheet');
   viewer.setMode(m);
   $('#height').classList.toggle('hidden', m !== '3d');
+  $('#toolsImage').classList.toggle('hidden', m !== 'image');
+  $('#imgInfo').classList.toggle('hidden', m !== 'image');
+  if (warp) { warp.renderer.domElement.style.display = m === 'image' ? 'block' : 'none'; if (m === 'image') warp.resize(); }
+  // u modu slike sakrij slajdere koje engine slike ne podržava
+  for (const [id, r] of Object.entries(rows)) r.row.classList.toggle('na', m === 'image' && !WARP_SUPPORTED.has(id));
+}
+
+// ---------- slika (live warp) ----------
+function defaultSheetImage() {
+  // čisti list (bez teksta) iz baznog modela kao zadana slika
+  body.apply(body.defaults());
+  viewer.update();
+  const url = viewer.snapshot(true, true);
+  body.apply(state.values);
+  viewer.update();
+  return url;
+}
+
+async function loadWarpImage(src, label) {
+  const n = await warp.setImage(src);
+  warp.update(state.values);
+  const names = { 1: 'sprijeda', 2: 'sprijeda + profil', 3: 'sprijeda + profil + otpozadi' };
+  $('#imgInfo').textContent = `${label} · pronađeno figura: ${n}${names[n] ? ' (' + names[n] + ')' : ''}`;
+  if (!n) toast('Na slici nisu pronađene figure (treba tamna kontura na svijetloj pozadini)');
+}
+
+async function ensureWarp() {
+  if (warp) return true;
+  try {
+    warp = new WarpView($('#viewer'));
+    warp.setFaceLeft(state.faceLeft);
+    $('#btnFace').textContent = `Profil gleda: ${state.faceLeft ? '←' : '→'}`;
+    let src = null;
+    try { src = localStorage.getItem(IMG_KEY); } catch { /* nema pohrane */ }
+    if (src) await loadWarpImage(src, 'Tvoja slika');
+    else await loadWarpImage(defaultSheetImage(), 'Zadana slika');
+    return true;
+  } catch (e) {
+    toast('Greška: ' + e.message);
+    return false;
+  }
+}
+
+function readImageFile(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, 2000 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/png'));
+      };
+      img.onerror = () => rej(new Error('nepodržan format slike'));
+      img.src = fr.result;
+    };
+    fr.onerror = () => rej(fr.error);
+    fr.readAsDataURL(file);
+  });
 }
 
 // ---------- likovi ----------
@@ -147,7 +215,7 @@ function doExport(kind) {
   close();
   try {
     if (kind === 'sheet') saveFile(`character_sheet_${stamp()}.png`, 'image/png', { dataUrl: viewer.snapshot(true) });
-    if (kind === 'view') saveFile(`body_${stamp()}.png`, 'image/png', { dataUrl: viewer.snapshot(false) });
+    if (kind === 'view') saveFile(`body_${stamp()}.png`, 'image/png', { dataUrl: state.mode === 'image' && warp ? warp.snapshot() : viewer.snapshot(state.mode === 'sheet') });
     if (kind === 'obj') saveFile(`body_${stamp()}.obj`, 'text/plain', { text: body.toOBJ() });
     if (kind === 'json') saveFile(`body_${stamp()}.json`, 'application/json', { text: JSON.stringify({ app: 'BodyCreator', values: state.values }, null, 1) });
   } catch (e) {
@@ -178,6 +246,27 @@ function doExport(kind) {
 
   document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => viewer.view(b.dataset.view));
+  $('#imgFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const url = await readImageFile(f);
+      try { localStorage.setItem(IMG_KEY, url); } catch { toast('Slika je prevelika za pamćenje, ali je učitana'); }
+      await loadWarpImage(url, 'Tvoja slika');
+    } catch (err) { toast('Greška: ' + err.message); }
+    e.target.value = '';
+  };
+  $('#btnDefImg').onclick = async () => {
+    try { localStorage.removeItem(IMG_KEY); } catch { /* */ }
+    await loadWarpImage(defaultSheetImage(), 'Zadana slika');
+  };
+  const orig = on => { warp?.setShowOriginal(on); $('#btnOrig').classList.toggle('on', on); };
+  $('#btnOrig').onpointerdown = () => orig(true);
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) $('#btnOrig').addEventListener(ev, () => orig(false));
+  $('#btnFace').onclick = () => {
+    state.faceLeft = !state.faceLeft; persist();
+    warp?.setFaceLeft(state.faceLeft);
+    $('#btnFace').textContent = `Profil gleda: ${state.faceLeft ? '←' : '→'}`;
+  };
   $('#skin').value = state.skin;
   $('#skin').oninput = e => { state.skin = e.target.value; viewer.setSkin(state.skin); persist(); };
   $('#guides').checked = state.guides;
